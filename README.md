@@ -1,2 +1,2 @@
 # lino
-A repository to automate posts to LinkenIn from Notion
+A repository to automate posts to LinkedIn from Notion
