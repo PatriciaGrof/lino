@@ -1,0 +1,36 @@
+name: Scheduled LinkedIn Publisher
+
+on:
+  schedule:
+    # IMPORTANT: Adjust the cron expression to your desired time.
+    # This example runs every Tuesday at 10:00 AM UTC (0 10 * * 2).
+    # UTC is recommended for scheduled automation.
+    - cron: '0 10 * * 2' 
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      # Changed this line to use the requirements.txt file
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run LinkedIn Publisher Script
+      # The 'env' block passes your GitHub Secrets as environment variables 
+      # into the Python script.
+      env:
+        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+        LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+        LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+      run: python publisher.py
