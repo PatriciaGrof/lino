@@ -3,12 +3,10 @@ import requests
 from notion_client import Client
 
 # --- 1. CONFIGURATION (Gets variables from GitHub Secrets) ---
-# Ensure these environment variables are set in your GitHub Actions workflow secrets
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 NOTION_DATABASE_ID = os.environ.get("NOTION_DB_ID")
 LINKEDIN_ACCESS_TOKEN = os.environ.get("LINKEDIN_ACCESS_TOKEN")
 LINKEDIN_PERSON_URN = os.environ.get("LINKEDIN_PERSON_URN") 
-# Example URN format: 'urn:li:person:123456789' - MANDATORY for posting
 
 # Initialize Notion Client
 if not NOTION_TOKEN:
@@ -31,10 +29,9 @@ def get_ready_to_post_article():
                     "equals": "Ready to Post"
                 }
             },
-            # Sort by Publish Date descending (or by Name)
             sorts=[
                 {
-                    "property": "Name", # Assuming 'Name' is your title
+                    "property": "Name",
                     "direction": "ascending"
                 }
             ]
