@@ -21,7 +21,7 @@ def get_ready_to_post_article():
     """
     print("--- Checking Notion Database for Ready-to-Post Articles ---")
     try:
-        response = notion.databases.query(
+        response = notion.data_sources.query(
             database_id=NOTION_DATABASE_ID,
             filter={
                 "property": "Status",
