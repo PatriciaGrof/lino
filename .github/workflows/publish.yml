@@ -33,4 +33,4 @@ jobs:
         NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
         LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
         LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
-      run: python publisher.py
+      run: python scripts/publisher.py
