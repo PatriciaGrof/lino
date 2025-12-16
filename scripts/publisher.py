@@ -22,7 +22,7 @@ def get_ready_to_post_article():
     print("--- Checking Notion Database for Ready-to-Post Articles ---")
     try:
         response = notion.data_sources.query(
-            database_id=NOTION_DATABASE_ID,
+            data_source_id=NOTION_DATABASE_ID,
             filter={
                 "property": "Status",
                 "select": {
