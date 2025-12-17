@@ -39,10 +39,10 @@ npm node publisher.js
 
 ### 5. Set up repository secrets for github workflow
 To automate the script, add the following secrets to your GitHub Repository (Settings > Secrets and variables > Actions):
-- `NOTION_SECRET`
-- `NOTION_DATABASE_ID`
-- `LINKEDIN_TOKEN`
-- `LINKEDIN_URN`
+- `NOTION_TOKEN`
+- `NOTION_DB_ID`
+- `LINKEDIN_ACCESS_TOKEN`
+- `LINKEDIN_PERSON_URN`
 
 ### 📊 Notion Database Schema
 
