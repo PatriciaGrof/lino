@@ -24,7 +24,7 @@ async function processLinkedinPosts() {
     for (const page of response.results) {
       const pageId = page.id;
       const title = page.properties['Name']?.title[0]?.plain_text || "Untitled";
-      const linkedinCopy = page.properties['LinkedIn Copy']?.rich_text[0]?.plain_text;
+      const linkedinCopy = page.properties['LinkedIn Copy']?.rich_text.map(part => part.plain_text).join('');
       const publicUrl = page.properties['Public URL']?.url;
 
       try {
@@ -87,12 +87,22 @@ async function postToLinkedin(text, url) {
         headers: {
           'Authorization': `Bearer ${linkedinAccessToken}`,
           'X-Restli-Protocol-Version': '2.0.0',
+          'Content-Type': 'application/json'
         },
       }
     );
+    console.log("LinkedIn Response Status:", response.status);
     return response.status === 201;
   } catch (err) {
-    console.error("LinkedIn API Error details:", JSON.stringify(err.response?.data, null, 2) || err.message);
+    // THIS PART IS KEY: It prints the specific error from LinkedIn's server
+    if (err.response) {
+      console.error("❌ LinkedIn API Error (Data):", JSON.stringify(err.response.data, null, 2));
+      console.error("❌ LinkedIn API Error (Status):", err.response.status);
+    } else if (err.request) {
+      console.error("❌ LinkedIn API Error (No Response): No response received from LinkedIn. Check your internet or URN format.");
+    } else {
+      console.error("❌ Error Message:", err.message);
+    }
     return false;
   }
 }
