@@ -1,36 +1,30 @@
 name: Scheduled LinkedIn Publisher
-
 on:
   schedule:
-    # IMPORTANT: Adjust the cron expression to your desired time.
-    # This example runs every Tuesday at 10:00 AM UTC (0 10 * * 2).
-    # UTC is recommended for scheduled automation.
-    - cron: '0 10 * * 2' 
-  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+    # Runs at 10:00 UTC (11:00 AM Paris Standard Time) every Thursday
+    - cron: '0 10 * * 4'
+  workflow_dispatch: # Allows to run it manually for testing
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        
-    - name: Install dependencies
-      # Changed this line to use the requirements.txt file
-      run: |
-        pip install -r requirements.txt
-        
-    - name: Run LinkedIn Publisher Script
-      # The 'env' block passes your GitHub Secrets as environment variables 
-      # into the Python script.
-      env:
-        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-        LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-        LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
-      run: python scripts/publisher.py
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run posting script
+        env:
+          NOTION_SECRET: ${{ secrets.NOTION_SECRET }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_URN: ${{ secrets.LINKEDIN_URN }}
+        run: node publisher.js 
