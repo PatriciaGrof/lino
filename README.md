@@ -26,10 +26,10 @@ An automated bridge that fetches scheduled articles from a **Notion Database** a
 
 ### 3. Create a .env file in the root directory (for local use)
 ```bash
-NOTION_SECRET=your_notion_secret
-NOTION_DATABASE_ID=your_database_id
-LINKEDIN_TOKEN=your_linkedin_access_token
-LINKEDIN_URN=urn:li:person:your_member_id
+NOTION_TOKEN=your_notion_secret
+NOTION_DB_ID=your_database_id
+LINKEDIN_ACCESS_TOKEN=your_linkedin_access_token
+LINKEDIN_PERSON_URN=urn:li:person:your_member_id
 ```
 
 ### 4. Run the script (for local use)
