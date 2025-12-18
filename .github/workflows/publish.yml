@@ -2,7 +2,7 @@ name: Scheduled LinkedIn Publisher
 on:
   schedule:
     # Runs at 10:00 UTC (11:00 AM Paris Standard Time) every Thursday
-    - cron: '16 10 * * 4'
+    - cron: '37 10 * * 4'
   workflow_dispatch: # Allows to run it manually for testing
 
 jobs:
