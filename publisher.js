@@ -26,14 +26,18 @@ async function processLinkedinPosts() {
       const title = page.properties['Name']?.title[0]?.plain_text || "Untitled";
       const linkedinCopy = page.properties['LinkedIn Copy']?.rich_text.map(part => part.plain_text).join('');
       const publicUrl = page.properties['Public URL']?.url;
+      
+      const imagesProperty = page.properties['Images']?.files || [];
+      const imageFile = imagesProperty.length > 0 ? imagesProperty[0] : null;
+      const imageUrl = imageFile ? (imageFile.file?.url || imageFile.external?.url) : null;
 
       try {
-        if (!linkedinCopy || !publicUrl) {
-          throw new Error("Missing LinkedIn Copy or Public URL");
+        if (!linkedinCopy) {
+          throw new Error("Missing LinkedIn Copy");
         }
 
         console.log(`Attempting to post: ${title}...`);
-        const isSuccess = await postToLinkedin(linkedinCopy, publicUrl);
+        const isSuccess = await postToLinkedin(linkedinCopy, publicUrl, imageUrl);
 
         if (isSuccess) {
           // SUCCESS: Move to Published
@@ -64,8 +68,82 @@ async function processLinkedinPosts() {
   }
 }
 
-async function postToLinkedin(text, url) {
+async function uploadImageToLinkedin(imageUrl) {
   try {
+    // 1. Register the upload
+    const registerResponse = await axios.post(
+      'https://api.linkedin.com/v2/assets?action=registerUpload',
+      {
+        registerUploadRequest: {
+          recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
+          owner: linkedinUrn,
+          serviceRelationships: [
+            {
+              relationshipType: 'OWNER',
+              identifier: 'urn:li:userGeneratedContent',
+            },
+          ],
+        },
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${linkedinAccessToken}`,
+          'X-Restli-Protocol-Version': '2.0.0',
+        },
+      }
+    );
+
+    const uploadUrl = registerResponse.data.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl;
+    const assetId = registerResponse.data.value.asset;
+
+    // 2. Download the image from Notion
+    const imageBuffer = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+
+    // 3. Upload the binary data to LinkedIn
+    await axios.put(uploadUrl, imageBuffer.data, {
+      headers: {
+        'Authorization': `Bearer ${linkedinAccessToken}`,
+        'Content-Type': 'image/jpeg',
+      },
+    });
+
+    return assetId;
+  } catch (error) {
+    console.error("❌ Image Upload Error:", error.response?.data || error.message);
+    return null;
+  }
+}
+
+async function postToLinkedin(text, url, imageUrl) {
+  try {
+    let shareMediaCategory = 'NONE';
+    let media = [];
+    let finalText = text;
+
+    if (imageUrl) {
+      const assetId = await uploadImageToLinkedin(imageUrl);
+      if (assetId) {
+        shareMediaCategory = 'IMAGE';
+        media = [{
+          status: 'READY',
+          media: assetId,
+        }];
+        // If there's also a link, append it to the text as LinkedIn's ugcPosts 
+        // doesn't support both Image and Article media in one share.
+        if (url) {
+          finalText += `\n\n${url}`;
+        }
+      }
+    }
+
+    if (shareMediaCategory === 'NONE' && url) {
+      shareMediaCategory = 'ARTICLE';
+      media = [{
+        status: 'READY',
+        originalUrl: url,
+      }];
+    }
+
     const response = await axios.post(
       'https://api.linkedin.com/v2/ugcPosts',
       {
@@ -73,12 +151,9 @@ async function postToLinkedin(text, url) {
         lifecycleState: 'PUBLISHED',
         specificContent: {
           'com.linkedin.ugc.ShareContent': {
-            shareCommentary: { text: text },
-            shareMediaCategory: 'ARTICLE',
-            media: [{
-              status: 'READY',
-              originalUrl: url,
-            }],
+            shareCommentary: { text: finalText },
+            shareMediaCategory: shareMediaCategory,
+            media: media,
           },
         },
         visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },

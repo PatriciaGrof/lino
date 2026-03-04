@@ -34,7 +34,7 @@ LINKEDIN_PERSON_URN=urn:li:person:your_member_id
 
 ### 4. Run the script (for local use)
 ```bash
-npm node publisher.js
+npm start
 ```
 
 ### 5. Set up repository secrets for github workflow
@@ -46,4 +46,13 @@ To automate the script, add the following secrets to your GitHub Repository (Set
 
 ### 📊 Notion Database Schema
 
-The database must have the following properties (case-sensitive): | Property | Type | Purpose | | :--- | :--- | :--- | | Name | Title | Title of the page | | Status | Select | Ready to Post, Test, Published, Post Failed | | LinkedIn Copy | Text | The body text of the post | | Public URL | URL | The link to the published Notion article | | Publish Date | Date | The date the post should go live |
+The database must have the following properties (case-sensitive):
+
+| Property | Type | Purpose |
+| :--- | :--- | :--- |
+| Name | Title | Title of the page |
+| Status | Select | Ready to Post, Test, Published, Post Failed |
+| LinkedIn Copy | Text | The body text of the post |
+| Public URL | URL | Optional: The link to the published Notion article |
+| Images | Files & media | Optional: Image file to post to LinkedIn |
+| Publish Date | Date | The date the post should go live |
