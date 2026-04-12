@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
-    "axios": "1.13.5",
+    "axios": "1.15.0",
     "dotenv": "^16.6.1"
   },
   "engines": {
